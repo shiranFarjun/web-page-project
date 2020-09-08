@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+</head>
+<style>
+    h1 {
+        text-align: center;
+    }
+
+    #continer-border>div {
+        border: 1px solid black;
+    }
+
+    #status {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row-reverse;
+
+
+    }
+
+    /* .success {
+        margin-right: 35%;
+    } */
+
+    #failures {
+        margin-left: 55%;
+    }
+
+
+    #cards div,
+    .card img {
+        width: 200px;
+        height: 100px;
+    }
+
+
+    #cards {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-gap: 10px;
+    }
+
+    /* [data-flipped="true"] {
+        background: red;
+    }
+
+    [data-flipped="false"] {
+        background: black;
+    } */
+</style>
+
+<body>
+    <div id="continer-border">
+        <h1>Memory Game</h1>
+        <div id="status">
+            <p id="success">Successes: </p>
+            <p id="failures">Failures: </p>
+            <button>New Game</button>
+            <select name="type-cards" id="cars">
+                <option value="animals">Animals</option>
+                <option value="number"> number</option>
+                <option value="letters">letters</option>
+            </select>
+        </div>
+        <div id="cards"></div>
+        <div id="info-game">
+            <div>
+
+                <p>Difficulty: </p>
+                <div class="difficulty">
+                    <button class="1">easy</button>
+                    <button class="2">medium</button>
+                    <button class="3">Hard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let imgSrcSecondClick = " ";
+        let imgSrcFirstClick = " ";
+        let successesCounter = 0;
+        let failuresCounter = 0;
+        let counterID = 0;
+        let counteNumCard = 0;
+        let cards = [];
+        let srcImgLetter = ["./imgLetters/a.png", "./imgLetters/b.png", "./imgLetters/c.jpg",
+            "./imgLetters/d.jpg", "./imgLetters/e.jpg", "./imgLetters/f.jpg"];
+
+
+        const successP = document.getElementById('success');
+        successP.textContent += successesCounter;
+        const failuresP = document.getElementById('failures');
+        failuresP.textContent += failuresCounter;
+
+        const borderDiv = document.getElementById('continer-border');
+        const cardsDiv = document.getElementById('cards');
+        borderDiv.appendChild(cardsDiv);
+        while (counteNumCard < 2) {
+            for (let i = 0; i < srcImgLetter.length; i++) {
+                counterID++;
+                const cardDiv = document.createElement('div');
+                cardDiv.classList.add("card");
+                cardDiv.setAttribute("data-flipped", false);
+                cardDiv.style.backgroundColor = "pink";
+                const imgCard = document.createElement('img');
+                imgCard.src = srcImgLetter[i];
+                imgCard.hidden = true;
+                cardDiv.addEventListener("click", checkIsEqual);
+                cardDiv.appendChild(imgCard);
+                cardsDiv.appendChild(cardDiv);
+                addNewObj(counterID, srcImgLetter[i]);
+            }
+            counteNumCard++;
+        }
+        console.log(cards);
+
+        function checkIsEqual(event) {
+            addAttributeFlip(event.currentTarget);       //flip card clicked
+            if (imgSrcFirstClick === " ") {               //get the src img of div is clicked at first time
+                imgSrcFirstClick = event.currentTarget.firstChild.getAttribute('src');
+                console.log("imgSrcfirst", imgSrcFirstClick);
+            } else {                                      //get the src img of div is clicked at second time
+                imgSrcSecondClick = event.currentTarget.firstChild.getAttribute('src');
+                setTimeout(removeListener, 500);
+                console.log("imgSrcSecond", imgSrcSecondClick);
+            }
+
+            if (imgSrcFirstClick !== " " && imgSrcSecondClick !== " ") {
+                if (imgSrcFirstClick === imgSrcSecondClick) {
+                    successesCounter += 1;
+                    const cardDiv = document.getElementsByClassName('card');
+                    for (let i = 0; i < cardDiv.length; i++) {
+                        cardDiv[i].addEventListener("click", checkIsEqual);
+                    }
+                    if (successesCounter === cards.length) {
+                        window.alert("You won");
+                    }
+                } else {
+                    //When I could not find two matching cards
+                    failuresCounter += 1;
+                    const cardDiv = document.getElementsByClassName('card');
+                    for (let i = 0; i < cardDiv.length; i++) {
+                        cardDiv[i].addEventListener("click", checkIsEqual);
+                    }
+                    event.currentTarget.firstChild.hidden = false;
+                }
+                console.log("end checkIsEqual");
+            }
+        }
+        function removeListener() {
+            console.log("removeListener");
+            const cardDiv = document.getElementsByClassName('card');
+            for (let i = 0; i < cardDiv.length; i++) {
+                cardDiv[i].removeEventListener("click", checkIsEqual);
+            }
+        }
+
+        function addAttributeFlip(element) {
+            element.firstChild.hidden = false;
+        }
+
+        function addNewObj(counter, srcImg) {
+            cards.push({
+                id: counter,
+                srcImage: srcImg
+            });
+            return counter++;
+        }
+        
+        function newGame() {
+            successesCounter = 0;
+            failuresCounter = 0;
+            counterID = 0;
+            counteNumCard = 0;
+            cards = [];
+        }
+
+    </script>
+</body>
+
+</html>
